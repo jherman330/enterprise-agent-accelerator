@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "hooks": {
+    "afterFileEdit": [
+      {
+        "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .cursor/hooks/scratchpad-audit.ps1"
+      }
+    ],
+    "subagentStart": [
+      {
+        "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .cursor/hooks/subagent-marker.ps1 start"
+      }
+    ],
+    "subagentStop": [
+      {
+        "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .cursor/hooks/subagent-marker.ps1 stop"
+      }
+    ]
+  }
+}

@@ -125,3 +125,18 @@ pre-commit run --all-files
   - `Validation`: what checks were run, or why a check was not applicable
 - Reference the Work Order number and title in the body when a Work Order exists
 - Do **NOT** paste the entire Work Order into the commit body unless the user explicitly asks or the Work Order system is unavailable
+
+---
+
+## AGENT SCRATCHPAD (agents-wip/)
+
+- `agents-wip/` is an **EPHEMERAL, gitignored** agent working area. It is **NEVER** the source of truth
+- The 8090 Work Orders/blueprints and committed code + commit messages remain authoritative
+- Structure:
+  - `agents-wip/WO-<n>/` for work-order tasks; `agents-wip/adhoc-<slug>/` for non-WO tasks
+  - Within a task dir: `review-<model>-<UTC>.md`, `synthesis.md`, `notes.md`
+  - `agents-wip/INDEX.md` is a manifest agents read first to orient
+- Naming includes the agent/model and a UTC timestamp, e.g. `review-opus-20260608T0040Z.md`
+- Findings are grouped **High / Medium / Low**; each item: `[file:line] issue — impact — suggested fix`
+- Subagents performing analysis/review **MUST** write only within `agents-wip/` and **MUST NOT** modify repository source as part of analysis tasks
+- Promote durable conclusions (decisions, fixes) into commits and, where applicable, Work Order comments; the scratchpad entry may then be deleted
