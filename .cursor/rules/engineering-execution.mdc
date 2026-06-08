@@ -128,6 +128,16 @@ pre-commit run --all-files
 
 ---
 
+## REVIEW & COMMIT GATE (HUMAN-IN-THE-LOOP)
+
+- **DO NOT commit or push without explicit user approval.** A previous one-time "commit and push" instruction is **NOT** standing authorization for future Work Orders
+- After implementing and validating a Work Order, **STOP** and present a concise summary plus the diff. Do not commit yet
+- Offer (and, when requested, perform) a code review before committing — e.g., a dual-model review written to `agents-wip/`. Verify any blocking finding against ground truth before acting on it
+- Only commit after the user explicitly approves; keep one logical commit per Work Order
+- During long-running work, **checkpoint** with the user with brief progress updates rather than going silent
+
+---
+
 ## AGENT SCRATCHPAD (agents-wip/)
 
 - `agents-wip/` is an **EPHEMERAL, gitignored** agent working area. It is **NEVER** the source of truth
