@@ -1,6 +1,7 @@
 using EnterpriseAgentAccelerator.Api.Configuration;
 using EnterpriseAgentAccelerator.Api.Prompt;
 using EnterpriseAgentAccelerator.Api.Session;
+using Microsoft.SemanticKernel;
 
 const string LocalDevCorsPolicy = "LocalDevCors";
 
@@ -14,6 +15,11 @@ builder.Logging.AddConsole();
 var azureOpenAiConfig = AzureOpenAiConfig.FromEnvironment();
 
 builder.Services.AddSingleton(azureOpenAiConfig);
+builder.Services.AddKernel()
+    .AddAzureOpenAIChatCompletion(
+        deploymentName: azureOpenAiConfig.Deployment,
+        endpoint: azureOpenAiConfig.Endpoint,
+        apiKey: azureOpenAiConfig.ApiKey);
 builder.Services.AddSingleton<ISessionStore, InMemorySessionStore>();
 builder.Services.AddTransient<IPromptBuilder, PromptBuilder>();
 
