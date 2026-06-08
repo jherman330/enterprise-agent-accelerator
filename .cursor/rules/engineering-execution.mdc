@@ -1,0 +1,127 @@
+---
+description: Authoritative engineering and execution rules for work orders
+alwaysApply: true
+---
+
+# Engineering & Execution Rules
+
+## Global Engineering and Execution Rules (Authoritative)
+
+**Applies to:** `python`, `typescript`, `go`, `markdown`
+
+---
+
+## NON-NEGOTIABLE DIRECTIVE
+
+**YOU MUST FOLLOW THESE RULES EXACTLY. THESE ARE NON-NEGOTIABLE.**
+
+---
+
+## WORK ORDER AUTHORITY
+
+- When an **8090 Work Order** exists, all work **MUST** strictly follow it
+- **DO NOT** add features, refactors, helpers, or improvements not explicitly specified
+- If requirements are ambiguous, **STOP** and ask for clarification
+- Each Work Order maps to **EXACTLY ONE** logical commit unless the user explicitly requests otherwise
+- **Never** batch multiple Work Orders
+- For repo bootstrap, documentation, investigation, or user-directed tasks without a Work Order, follow the user's explicit request and keep changes narrowly scoped
+
+---
+
+## EXECUTION & COMPLETION RULES
+
+A Work Order is **NOT complete** until **ALL** of the following are true:
+
+- All relevant tests pass locally
+- Pre-commit hooks pass when configured
+- CI passes when configured
+- CD passes (if applicable)
+
+Additional constraints:
+
+- If CI or CD fails, diagnose and fix **immediately** before continuing
+- **DO NOT** proceed to another Work Order while the pipeline is red
+- If required tooling is not configured yet, state that clearly and do not invent substitute gates
+- Assume your output will be executed **exactly as written**
+
+---
+
+## TEST STRATEGY (SIGNAL OVER NOISE)
+
+- Target **>=50% coverage** with **HIGH-SIGNAL tests only**
+- Every test must answer:
+  **"Would this catch a real production bug?"**
+
+### HIGH-SIGNAL TESTS (ALWAYS INCLUDE)
+
+- API workflows & integration paths
+- Business logic and validation
+- Error handling & failure modes
+- Security & auth flows
+- Cross-component behavior
+
+### LOW-SIGNAL TESTS (PROHIBITED)
+
+- Field existence tests
+- Getters / setters / constructors
+- Framework behavior tests
+- Configuration loading tests
+- Coverage padding
+
+---
+
+## BUILD & CORRECTNESS
+
+- Code **MUST** compile and type-check cleanly
+- Python: `mypy` / `pyright` clean when configured
+- TypeScript: strict `tsc` clean when configured
+- **NEVER** emit code that cannot run
+- **NEVER** access private/protected members outside their owning class/module
+- **NEVER** bypass encapsulation "because it works"
+
+---
+
+## SECURITY & DEPENDENCIES
+
+- **NEVER** commit secrets, credentials, tokens, keys, or real customer data
+- Use environment variables or secret managers for sensitive configuration
+- Add dependencies only when necessary and prefer established, maintained packages
+- Do not introduce new infrastructure, services, or runtime requirements without explicit scope
+- For database or schema changes, include migration, rollback, and compatibility considerations
+
+---
+
+## AGENTIC CODE GENERATION GUARDRAILS
+
+- Treat generated code as untrusted until reviewed against the Work Order, tests, and project patterns
+- Prefer existing architecture and local conventions over new abstractions
+- Keep generated changes small, reviewable, and tied to a single intent
+- Remove dead code, scaffolding, debug prints, and placeholder logic before completion
+- Document non-obvious decisions in code comments or the final response
+
+---
+
+## GIT & PRE-COMMIT (ENFORCED)
+
+- Pre-commit hooks are **REQUIRED** once configured
+- Always run before completion when configured:
+
+```bash
+pre-commit run --all-files
+```
+
+---
+
+## COMMIT MESSAGE CONVENTIONS
+
+- Work Order commit subjects **MUST** start with `WO-X:` where `X` is the Work Order number
+- Ad-hoc commit subjects **MUST** start with `ad-hoc:` when no Work Order applies
+- Use exactly one logical commit per Work Order unless the user explicitly requests otherwise
+- Do not mix Work Order implementation changes with unrelated ad-hoc setup changes
+- Commit bodies must be written for agent and human PR reviewers and include:
+  - `Intent`: why the change exists
+  - `Scope`: what changed
+  - `Out of scope`: what was deliberately not changed
+  - `Validation`: what checks were run, or why a check was not applicable
+- Reference the Work Order number and title in the body when a Work Order exists
+- Do **NOT** paste the entire Work Order into the commit body unless the user explicitly asks or the Work Order system is unavailable

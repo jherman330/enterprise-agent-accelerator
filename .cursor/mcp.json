@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "software-factory-enterprise-agen": {
+      "type": "http",
+      "url": "https://api.factory.8090.dev/v2/mcp",
+      "headers": {
+        "X-Sofa-Mcp-Project-Id": "fe47ef41-9c0c-4170-aa1f-e0e125847e6f"
+      }
+    }
+  }
+}
