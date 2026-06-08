@@ -1,0 +1,6 @@
+@EnterpriseAgentAccelerator.Api_HostAddress = http://localhost:5082
+
+GET {{EnterpriseAgentAccelerator.Api_HostAddress}}/health
+Accept: application/json
+
+###
