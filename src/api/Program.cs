@@ -1,4 +1,5 @@
 using EnterpriseAgentAccelerator.Api.Configuration;
+using EnterpriseAgentAccelerator.Api.Session;
 
 const string LocalDevCorsPolicy = "LocalDevCors";
 
@@ -12,6 +13,7 @@ builder.Logging.AddConsole();
 var azureOpenAiConfig = AzureOpenAiConfig.FromEnvironment();
 
 builder.Services.AddSingleton(azureOpenAiConfig);
+builder.Services.AddSingleton<ISessionStore, InMemorySessionStore>();
 
 if (builder.Environment.IsDevelopment())
 {
