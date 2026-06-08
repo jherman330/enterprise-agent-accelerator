@@ -6,7 +6,7 @@ Enterprise Agent Accelerator is a reference application for a local developer wo
 
 > Full setup instructions will be expanded as the project builds out.
 
-**Prerequisites:** Docker Desktop, .NET 8 SDK, Node 18+
+**Prerequisites:** Docker Desktop, .NET 9 SDK, Node 18+
 
 **Quick start (Docker):**
 
