@@ -123,6 +123,7 @@ pre-commit run --all-files
   - `Scope`: what changed
   - `Out of scope`: what was deliberately not changed
   - `Validation`: what checks were run, or why a check was not applicable
+  - `Review`: concise synthesized code-review outcome when an `agents-wip/<task>/synthesis.md` exists; include blocker status and fixes, not the full scratchpad
 - Reference the Work Order number and title in the body when a Work Order exists
 - Do **NOT** paste the entire Work Order into the commit body unless the user explicitly asks or the Work Order system is unavailable
 
@@ -133,6 +134,7 @@ pre-commit run --all-files
 - **DO NOT commit or push without explicit user approval.** A previous one-time "commit and push" instruction is **NOT** standing authorization for future Work Orders
 - After implementing and validating a Work Order, **STOP** and present a concise summary plus the diff. Do not commit yet
 - Offer (and, when requested, perform) a code review before committing — e.g., a dual-model review written to `agents-wip/`. Verify any blocking finding against ground truth before acting on it
+- When creating a PR or commit after a review, include a short synthesized review note if available: mention that review ran, whether High/Medium blockers remain, and which blocking findings were fixed or accepted
 - Only commit after the user explicitly approves; keep one logical commit per Work Order
 - During long-running work, **checkpoint** with the user with brief progress updates rather than going silent
 
