@@ -1,37 +1,23 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace EnterpriseAgentAccelerator.Api.Configuration;
 
-public sealed record AzureOpenAiConfig(
-    string Endpoint,
-    string Deployment,
-    string ApiKey)
+public sealed class AzureOpenAiConfig
 {
-    private const string EndpointVariableName = "AZURE_OPENAI_ENDPOINT";
-    private const string DeploymentVariableName = "AZURE_OPENAI_DEPLOYMENT";
-    private const string ApiKeyVariableName = "AZURE_OPENAI_API_KEY";
+    [Required]
+    [MinLength(1)]
+    public string Endpoint { get; init; } = string.Empty;
 
-    public static AzureOpenAiConfig FromEnvironment()
-    {
-        return new AzureOpenAiConfig(
-            GetRequiredEnvironmentVariable(EndpointVariableName),
-            GetRequiredEnvironmentVariable(DeploymentVariableName),
-            GetRequiredEnvironmentVariable(ApiKeyVariableName));
-    }
+    [Required]
+    [MinLength(1)]
+    public string Deployment { get; init; } = string.Empty;
+
+    [Required]
+    [MinLength(1)]
+    public string ApiKey { get; init; } = string.Empty;
 
     public override string ToString()
     {
         return $"{nameof(AzureOpenAiConfig)} {{ Endpoint = {Endpoint}, Deployment = {Deployment}, ApiKey = *** }}";
-    }
-
-    private static string GetRequiredEnvironmentVariable(string variableName)
-    {
-        var value = Environment.GetEnvironmentVariable(variableName);
-
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            throw new InvalidOperationException(
-                $"Required environment variable '{variableName}' is missing or empty.");
-        }
-
-        return value;
     }
 }

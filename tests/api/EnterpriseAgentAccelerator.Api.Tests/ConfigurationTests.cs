@@ -1,4 +1,7 @@
 using EnterpriseAgentAccelerator.Api.Configuration;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Options;
 
 namespace EnterpriseAgentAccelerator.Api.Tests;
 
@@ -10,61 +13,14 @@ public sealed class ConfigurationTests
     private const string CorsAllowedOriginVariableName = "CORS_ALLOWED_ORIGIN";
 
     [Fact]
-    public void AzureOpenAiConfigFromEnvironmentReadsRequiredValues()
-    {
-        using var environment = new EnvironmentVariableScope();
-        environment.Set(EndpointVariableName, "https://example.openai.azure.com/");
-        environment.Set(DeploymentVariableName, "test-deployment");
-        environment.Set(ApiKeyVariableName, "test-api-key");
-
-        var config = AzureOpenAiConfig.FromEnvironment();
-
-        Assert.Equal("https://example.openai.azure.com/", config.Endpoint);
-        Assert.Equal("test-deployment", config.Deployment);
-        Assert.Equal("test-api-key", config.ApiKey);
-    }
-
-    [Theory]
-    [InlineData(EndpointVariableName)]
-    [InlineData(DeploymentVariableName)]
-    [InlineData(ApiKeyVariableName)]
-    public void AzureOpenAiConfigFromEnvironmentThrowsWhenRequiredValueIsMissing(string missingVariableName)
-    {
-        using var environment = new EnvironmentVariableScope();
-        environment.Set(EndpointVariableName, "https://example.openai.azure.com/");
-        environment.Set(DeploymentVariableName, "test-deployment");
-        environment.Set(ApiKeyVariableName, "test-api-key");
-        environment.Set(missingVariableName, null);
-
-        var exception = Assert.Throws<InvalidOperationException>(AzureOpenAiConfig.FromEnvironment);
-
-        Assert.Contains(missingVariableName, exception.Message);
-    }
-
-    [Theory]
-    [InlineData(EndpointVariableName)]
-    [InlineData(DeploymentVariableName)]
-    [InlineData(ApiKeyVariableName)]
-    public void AzureOpenAiConfigFromEnvironmentThrowsWhenRequiredValueIsEmpty(string emptyVariableName)
-    {
-        using var environment = new EnvironmentVariableScope();
-        environment.Set(EndpointVariableName, "https://example.openai.azure.com/");
-        environment.Set(DeploymentVariableName, "test-deployment");
-        environment.Set(ApiKeyVariableName, "test-api-key");
-        environment.Set(emptyVariableName, " ");
-
-        var exception = Assert.Throws<InvalidOperationException>(AzureOpenAiConfig.FromEnvironment);
-
-        Assert.Contains(emptyVariableName, exception.Message);
-    }
-
-    [Fact]
     public void AzureOpenAiConfigToStringRedactsApiKey()
     {
-        var config = new AzureOpenAiConfig(
-            "https://example.openai.azure.com/",
-            "test-deployment",
-            "super-secret-key");
+        var config = new AzureOpenAiConfig
+        {
+            Endpoint = "https://example.openai.azure.com/",
+            Deployment = "test-deployment",
+            ApiKey = "super-secret-key",
+        };
 
         var configString = config.ToString();
 
@@ -72,28 +28,66 @@ public sealed class ConfigurationTests
         Assert.Contains("ApiKey = ***", configString);
     }
 
-    [Fact]
-    public void AppConfigFromEnvironmentReadsRequiredValues()
+    [Theory]
+    [InlineData(EndpointVariableName, "Endpoint")]
+    [InlineData(DeploymentVariableName, "Deployment")]
+    [InlineData(ApiKeyVariableName, "ApiKey")]
+    public void HostFailsToStartWhenAzureOpenAiValueIsMissing(string missingVariableName, string expectedPropertyName)
     {
-        using var environment = new EnvironmentVariableScope();
-        environment.Set(CorsAllowedOriginVariableName, "http://localhost:5173");
+        using var environment = SetAzureOpenAiEnvironmentVariables();
+        environment.Set(missingVariableName, null);
 
-        var config = AppConfig.FromEnvironment();
+        var exception = AssertHostFailsToStart("Production");
 
-        Assert.Equal("http://localhost:5173", config.CorsAllowedOrigin);
+        Assert.Contains(expectedPropertyName, exception.Message, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData(EndpointVariableName, "Endpoint")]
+    [InlineData(DeploymentVariableName, "Deployment")]
+    [InlineData(ApiKeyVariableName, "ApiKey")]
+    public void HostFailsToStartWhenAzureOpenAiValueIsEmpty(string emptyVariableName, string expectedPropertyName)
+    {
+        using var environment = SetAzureOpenAiEnvironmentVariables();
+        environment.Set(emptyVariableName, " ");
+
+        var exception = AssertHostFailsToStart("Production");
+
+        Assert.Contains(expectedPropertyName, exception.Message, StringComparison.Ordinal);
     }
 
     [Theory]
     [InlineData(null)]
     [InlineData("")]
     [InlineData(" ")]
-    public void AppConfigFromEnvironmentThrowsWhenCorsAllowedOriginIsMissingOrEmpty(string? value)
+    public void DevelopmentHostFailsToStartWhenCorsAllowedOriginIsMissingOrEmpty(string? value)
     {
-        using var environment = new EnvironmentVariableScope();
+        using var environment = SetAzureOpenAiEnvironmentVariables();
         environment.Set(CorsAllowedOriginVariableName, value);
 
-        var exception = Assert.Throws<InvalidOperationException>(AppConfig.FromEnvironment);
+        var exception = AssertHostFailsToStart("Development");
 
-        Assert.Contains(CorsAllowedOriginVariableName, exception.Message);
+        Assert.Contains("CorsAllowedOrigin", exception.Message, StringComparison.Ordinal);
+    }
+
+    private static OptionsValidationException AssertHostFailsToStart(string environmentName)
+    {
+        return Assert.Throws<OptionsValidationException>(() =>
+        {
+            using var factory = new WebApplicationFactory<Program>()
+                .WithWebHostBuilder(builder => builder.UseEnvironment(environmentName));
+
+            factory.CreateClient();
+        });
+    }
+
+    private static EnvironmentVariableScope SetAzureOpenAiEnvironmentVariables()
+    {
+        var environment = new EnvironmentVariableScope();
+        environment.Set(EndpointVariableName, "https://example.openai.azure.com/");
+        environment.Set(DeploymentVariableName, "test-deployment");
+        environment.Set(ApiKeyVariableName, "test-api-key");
+
+        return environment;
     }
 }
