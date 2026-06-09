@@ -1,4 +1,5 @@
 using EnterpriseAgentAccelerator.Api.Configuration;
+using EnterpriseAgentAccelerator.Api.Orchestration;
 using EnterpriseAgentAccelerator.Api.Prompt;
 using EnterpriseAgentAccelerator.Api.Session;
 using Microsoft.Extensions.Options;
@@ -44,6 +45,7 @@ builder.Services.AddSingleton<IChatCompletionService>(sp =>
 });
 builder.Services.AddSingleton<ISessionStore, InMemorySessionStore>();
 builder.Services.AddTransient<IPromptBuilder, PromptBuilder>();
+builder.Services.AddScoped<ISemanticKernelOrchestrator, SemanticKernelOrchestrator>();
 
 if (builder.Environment.IsDevelopment())
 {
