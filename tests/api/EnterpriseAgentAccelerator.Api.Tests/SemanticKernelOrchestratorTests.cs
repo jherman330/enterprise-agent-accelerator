@@ -2,6 +2,7 @@ using EnterpriseAgentAccelerator.Api.Configuration;
 using EnterpriseAgentAccelerator.Api.Orchestration;
 using EnterpriseAgentAccelerator.Api.Prompt;
 using EnterpriseAgentAccelerator.Api.Session;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel.ChatCompletion;
 
@@ -26,7 +27,8 @@ public sealed class SemanticKernelOrchestratorTests
             sessionStore ?? new InMemorySessionStore(),
             new PromptBuilder(),
             chatCompletionService,
-            config);
+            config,
+            NullLogger<SemanticKernelOrchestrator>.Instance);
     }
 
     [Fact]
