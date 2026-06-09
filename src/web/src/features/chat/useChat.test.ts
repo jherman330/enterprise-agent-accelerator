@@ -130,6 +130,21 @@ test('clears a previous error and networkError when a new message is submitted',
   expect(result.current.networkError).toBe(false);
 });
 
+test('exposes the model from the response (null until the first successful response)', async () => {
+  sendChatMessageMock.mockResolvedValue(
+    makeResponse({ model: 'gpt-deployment' }),
+  );
+  const { result } = renderHook(() => useChat());
+
+  expect(result.current.model).toBeNull();
+
+  await act(async () => {
+    await result.current.sendMessage('hello');
+  });
+
+  expect(result.current.model).toBe('gpt-deployment');
+});
+
 test('reuses the same session ID across requests', async () => {
   sendChatMessageMock.mockResolvedValue(makeResponse());
   const { result } = renderHook(() => useChat());

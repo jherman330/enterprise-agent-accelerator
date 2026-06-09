@@ -12,6 +12,7 @@ export interface UseChatResult {
   isLoading: boolean;
   error: string | null;
   networkError: boolean;
+  model: string | null;
   sendMessage: (content: string) => Promise<void>;
 }
 
@@ -21,6 +22,7 @@ export function useChat(): UseChatResult {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [networkError, setNetworkError] = useState(false);
+  const [model, setModel] = useState<string | null>(null);
 
   const sendMessage = useCallback(
     async (content: string): Promise<void> => {
@@ -44,6 +46,7 @@ export function useChat(): UseChatResult {
           content: response.response,
           timestamp: response.createdAt,
         };
+        setModel(response.model);
         setMessages((current) => [...current, assistantMessage]);
       } catch (caught) {
         if (caught instanceof NetworkError) {
@@ -58,5 +61,13 @@ export function useChat(): UseChatResult {
     [sessionId],
   );
 
-  return { sessionId, messages, isLoading, error, networkError, sendMessage };
+  return {
+    sessionId,
+    messages,
+    isLoading,
+    error,
+    networkError,
+    model,
+    sendMessage,
+  };
 }
